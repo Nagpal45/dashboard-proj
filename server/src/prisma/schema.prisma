@@ -8,6 +8,12 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Status {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
 model Cohort {
   id       Int       @id @default(autoincrement())
   name     String
@@ -26,13 +32,13 @@ model Course {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 }
-
 model Student {
   id       Int       @id @default(autoincrement())
   name     String
   cohortId Int?
   cohort   Cohort?   @relation("CohortStudents", fields: [cohortId], references: [id])
   courses  StudentCourse[]
+  status   Status    @default(ACTIVE)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
