@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Cohort {
+  id       Int       @id @default(autoincrement())
+  name     String
+  courses  Course[]  @relation("CohortCourses")
+  students Student[] @relation("CohortStudents")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id             Int              @id @default(autoincrement())
+  name           String
+  cohortId       Int
+  cohort         Cohort           @relation("CohortCourses", fields: [cohortId], references: [id])
+  studentCourses StudentCourse[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model Student {
+  id       Int       @id @default(autoincrement())
+  name     String
+  cohortId Int?
+  cohort   Cohort?   @relation("CohortStudents", fields: [cohortId], references: [id])
+  courses  StudentCourse[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StudentCourse {
+  id        Int     @id @default(autoincrement())
+  studentId Int
+  courseId  Int
+  student   Student @relation(fields: [studentId], references: [id])
+  course    Course  @relation(fields: [courseId], references: [id]) 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, courseId]) 
+}
