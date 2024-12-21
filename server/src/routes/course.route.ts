@@ -15,9 +15,9 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/:cohortId", async (req, res) => {
+  const { cohortId } = req.params;
   try {
-    const { cohortId } = req.body;
     const courses = await prisma.course.findMany({
       where: { cohortId: Number(cohortId) },
     });

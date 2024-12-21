@@ -25,10 +25,10 @@ const SideBar = () => {
           >
             <li
               key={index}
-              className={`flex items-center gap-[10px] font-bold text-[16px] p-[12px] rounded-[6px] ${
+              className={`flex items-center gap-[10px] text-[16px] p-[12px] rounded-[6px] ${
                 active === option.label
-                  ? "bg-[#EEEEEE] text-black"
-                  : "text-[#6F767E]"
+                  ? "bg-[#EEEEEE] text-black font-bold"
+                  : "text-[#6F767E] font-semibold"
               }`}
               onClick={() => setActive(option.label)}
             >

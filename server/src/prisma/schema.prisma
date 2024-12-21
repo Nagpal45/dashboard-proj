@@ -16,7 +16,7 @@ enum Status {
 
 model Cohort {
   id       Int       @id @default(autoincrement())
-  name     String
+  name     String    @unique
   courses  Course[]  @relation("CohortCourses")
   students Student[] @relation("CohortStudents")
   createdAt DateTime @default(now())
@@ -34,7 +34,7 @@ model Course {
 }
 model Student {
   id       Int       @id @default(autoincrement())
-  name     String
+  name     String    
   cohortId Int?
   cohort   Cohort?   @relation("CohortStudents", fields: [cohortId], references: [id])
   courses  StudentCourse[]
