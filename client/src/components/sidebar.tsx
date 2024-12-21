@@ -15,7 +15,7 @@ const SideBar = () => {
   const [active, setActive] = useState("Dashboard");
 
   return (
-    <div className="h-screen w-[248px] bg-white px-[12px] py-[30px] flex flex-col gap-[30px]">
+    <div className="h-screen w-[280px] bg-white px-[12px] py-[30px] flex flex-col gap-[30px]">
       <img src="/logo.svg" alt="logo" width={98} height={42} />
       <ul className="flex flex-col gap-[8px]">
         {navOptions.map((option, index) => (
@@ -25,7 +25,7 @@ const SideBar = () => {
           >
             <li
               key={index}
-              className={`flex items-center gap-[10px] font-[700] p-[12px] rounded-[6px] ${
+              className={`flex items-center gap-[10px] font-bold text-[16px] p-[12px] rounded-[6px] ${
                 active === option.label
                   ? "bg-[#EEEEEE] text-black"
                   : "text-[#6F767E]"

@@ -1,7 +1,9 @@
+
+
 const Dashboard = () => {
   return (
-    <div>
-      <h1>Dashboard</h1>
+    <div className="bg-white w-full h-full rounded-[12px]">
+      Dashboard
     </div>
   );
 };
