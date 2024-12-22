@@ -51,14 +51,39 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.get("/:cohortId", async (req, res) => {
+
+router.get("/:cohortId?", async (req, res) => {
   try {
     const { cohortId } = req.params;
+    const { courseId } = req.query;
+    const cohortFilter = cohortId ? { cohortId: Number(cohortId) } : {};
+
+    const courseFilter = courseId
+      ? {
+          courses: {
+            some: {
+              courseId: Number(courseId)
+            }
+          }
+        }
+      : {};
+
+    const filter = {
+      ...cohortFilter,
+      ...courseFilter
+    };
+
     const students = await prisma.student.findMany({
-      where: { 
-        cohortId: Number(cohortId) 
-      },
+      where: filter,
       include: {
+        cohort: { 
+          select: {
+            id: true,
+            name: true,
+            createdAt: true,
+            updatedAt: true,
+          }
+        },
         courses: {
           include: {
             course: {
@@ -80,6 +105,12 @@ router.get("/:cohortId", async (req, res) => {
       status: student.status,
       createdAt: student.createdAt,
       updatedAt: student.updatedAt,
+      cohort: student.cohort ? {
+        id: student.cohort.id,
+        name: student.cohort.name,
+        createdAt: student.cohort.createdAt,
+        updatedAt: student.cohort.updatedAt
+      } : null,
       courses: student.courses.map(sc => ({
         id: sc.course.id,
         name: sc.course.name,
@@ -90,26 +121,15 @@ router.get("/:cohortId", async (req, res) => {
 
     res.json(transformedStudents);
   } catch (error) {
-    console.error("Error fetching cohort students:", error);
+    console.error("Error fetching students:", error);
     res.status(500).json({ 
-      error: "Failed to fetch cohort students",
+      error: "Failed to fetch students",
       details: error
     });
   }
 });
 
-router.get("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const courses = await prisma.studentCourse.findMany({
-      where: { studentId: Number(id) },
-      include: { course: true },
-    });
-    
-    res.json(courses);
-  } catch (error) {
-    res.status(500).json({ error: error });
-  }
-});
+
+
 
 export default router;

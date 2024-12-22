@@ -140,9 +140,7 @@ const Dashboard = () => {
       const response = await apiRequest.get(`/student/${cohortId}`);
 
       if (response.data.length === 0) {
-        setStudents([
-          { id: "0", name: "No students available", cohortId, courses: [] },
-        ]);
+        setStudents([]);
       } else {
         setStudents(response.data);
       }
