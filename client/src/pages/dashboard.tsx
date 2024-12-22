@@ -1,18 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import apiRequest from "../lib/apiRequest";
+import { Cohort, Course, DashboardOption, Student } from "../lib/types";
+import { DashboardCard } from "../components/dashboardCard";
+import { DialogHeader } from "../components/dialogHeader";
+import { CreateCohortForm } from "../components/forms/createCohort";
+import { CreateCourseForm } from "../components/forms/createCourse";
+import { AddStudentForm } from "../components/forms/addStudent";
+import { ViewCohorts } from "../components/views/viewCohorts";
+import { ViewCourses } from "../components/views/viewcourses";
+import { ViewStudents } from "../components/views/viewStudents";
 
 const Dashboard = () => {
-  interface Cohort {
-    id: string;
-    name: string;
-  }
-
-  interface Course {
-    id: string;
-    name: string;
-    cohortId: string;
-  }
-
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [dialogContent, setDialogContent] = useState({
     title: "",
@@ -21,58 +19,42 @@ const Dashboard = () => {
   const [response, setResponse] = useState<string>("");
   const [cohorts, setCohorts] = useState<Cohort[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
 
-  const dashboardOptions = [
-    {
-      title: "Create Cohort",
-      description: "Create a new cohort for your students",
-    },
-    {
-      title: "View Cohorts",
-      description: "View all the cohorts you have created",
-    },
-    {
-      title: "Create Course",
-      description: "Create a new course in your cohort",
-    },
-    {
-      title: "View Courses",
-      description: "View all the courses in your cohort",
-    },
-    {
-      title: "Add Student",
-      description: "Add a student to your cohort and assign courses",
-    },
-    {
-      title: "View Students",
-      description: "View all the students in your cohort",
-    },
+  const dashboardOptions: DashboardOption[] = [
+    { title: "Create Cohort", description: "Create a new cohort for your students" },
+    { title: "View Cohorts", description: "View all the cohorts you have created" },
+    { title: "Create Course", description: "Create a new course in your cohort" },
+    { title: "View Courses", description: "View all the courses in your cohort" },
+    { title: "Add Student", description: "Add a student to your cohort and assign courses" },
+    { title: "View Students", description: "View all the students in your cohort" },
   ];
 
-  useEffect(() => {
-    const fetchCohorts = async () => {
-      try {
-        const response = await apiRequest.get("/cohort");
-        setCohorts(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const fetchData = async (url: string, setState: Function, fallback: any = []) => {
+    try {
+      const response = await apiRequest.get(url);
+      setState(response.data.length ? response.data : fallback);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    fetchCohorts();
+  const handleSuccess = (statusText: string) => {
+    setResponse(`${statusText}!`);
+    setTimeout(() => setResponse(""), 2000);
+  };
+
+  useEffect(() => {
+    fetchData("/cohort", setCohorts);
   }, [response]);
 
   const openDialog = (option: { title: string; description: string }) => {
     setDialogContent(option);
-    if (dialogRef.current) {
-      dialogRef.current.showModal();
-    }
+    dialogRef.current?.showModal();
   };
 
   const closeDialog = () => {
-    if (dialogRef.current) {
-      dialogRef.current.close();
-    }
+    dialogRef.current?.close();
     setResponse("");
     setCourses([]);
     setDialogContent({ title: "", description: "" });
@@ -80,185 +62,109 @@ const Dashboard = () => {
 
   const handleSubmit = async (title: string, e: React.FormEvent) => {
     e.preventDefault();
-    if (title === "Create Cohort") {
-      const cohortName = (e.target as HTMLFormElement).cohortName.value;
-      try {
-        const response = await apiRequest.post("/cohort", { name: cohortName });
+    const form = e.target as HTMLFormElement;
 
-        (e.target as HTMLFormElement).reset();
-        setResponse(response.statusText + "!");
-        setTimeout(() => {
-          setResponse("");
-        }, 2000);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    if (title === "Create Course") {
-      const courseName = (e.target as HTMLFormElement).courseName.value;
-      const cohortId = (e.target as HTMLFormElement).cohortId.value;
-      try {
-        const response = await apiRequest.post("/course", {
-          name: courseName,
-          cohortId,
-        });
-        (e.target as HTMLFormElement).reset();
-        setResponse(response.statusText + "!");
-        setTimeout(() => {
-          setResponse("");
-        }, 2000);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
-
-  const handleViewCourses = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const cohortId = e.target.value;
     try {
-      const response = await apiRequest.get(`/course/${cohortId}`);
-      if (response.data.length === 0) {
-        setCourses([{ id: "0", name: "No courses available", cohortId }]);
-      }else{
-        setCourses(response.data);
+      if (title === "Create Cohort") {
+        const response = await apiRequest.post("/cohort", { name: form.cohortName.value });
+        form.reset();
+        handleSuccess(response.statusText);
+
+      } else if (title === "Create Course") {
+        const response = await apiRequest.post("/course", {
+          name: form.courseName.value,
+          cohortId: form.cohortId.value,
+        });
+        form.reset();
+        handleSuccess(response.statusText);
+        
+      } else if (title === "Add Student") {
+        const courses = Array.from(form.courseId as unknown as HTMLInputElement[])
+          .filter((input) => input.checked)
+          .map((input) => input.value);
+
+        const response = await apiRequest.post("/student", {
+          name: form.studentName.value,
+          cohortId: form.cohortId.value,
+          courses,
+        });
+        form.reset();
+        handleSuccess(response.statusText);
       }
     } catch (error) {
       console.error(error);
     }
   };
 
+  const handleView = async (type: string, cohortId: string) => {
+    if (type === "courses") {
+      fetchData(`/course/${cohortId}`, setCourses, [{ id: "0", name: "No courses available", cohortId }]);
+    } else if (type === "students") {
+      fetchData(`/student/${cohortId}`, setStudents, [{ id: "0", name: "No students available", cohortId, courses: [] }]);
+    }
+  };
+
+  const formComponents: Record<string, JSX.Element> = {
+    "Create Cohort": <CreateCohortForm onSubmit={(e) => handleSubmit(dialogContent.title, e)} response={response} />,
+    "Create Course": (
+      <CreateCourseForm
+        onSubmit={(e) => handleSubmit(dialogContent.title, e)}
+        response={response}
+        cohorts={cohorts}
+      />
+    ),
+    "Add Student": (
+      <AddStudentForm
+        onSubmit={(e) => handleSubmit(dialogContent.title, e)}
+        response={response}
+        cohorts={cohorts}
+        courses={courses}
+        onCohortSelect={(e) => handleView("courses", e.target.value)}
+      />
+    ),
+  };
+
+  const viewComponents: Record<string, JSX.Element> = {
+    "View Cohorts": <ViewCohorts cohorts={cohorts} />,
+    "View Courses": (
+      <ViewCourses
+        cohorts={cohorts}
+        courses={courses}
+        onCohortSelect={(e) => handleView("courses", e.target.value)}
+      />
+    ),
+    "View Students": (
+      <ViewStudents
+        cohorts={cohorts}
+        students={students}
+        onCohortSelect={(e) => handleView("students", e.target.value)}
+      />
+    ),
+  };
+
   return (
     <div className="p-5 pb-10">
       <div className="grid grid-cols-2 gap-7 overflow-hidden">
         {dashboardOptions.map((option, index) => (
-          <div
+          <DashboardCard
             key={index}
-            className="border border-2 p-4 rounded-2xl flex flex-row shadow-lg items-center justify-between"
-          >
-            <div>
-              <h3 className="text-xl font-bold">{option.title}</h3>
-              <p>{option.description}</p>
-            </div>
-            <button
-              className="bg-black text-white w-[90px] h-[42px] mt-10 rounded-full"
-              onClick={() => openDialog(option)}
-            >
-              {option.title.split(" ")[0]}
-            </button>
-          </div>
+            option={option}
+            onAction={() => openDialog(option)}
+          />
         ))}
       </div>
 
       <dialog
         ref={dialogRef}
-        className="rounded-lg p-5 w-1/3 backdrop:bg-black/70"
+        className="rounded-lg p-5 w-1/3 backdrop:bg-black/70 max-h-[600px]"
       >
-        <div className="flex flex-row justify-between items-start">
-          <div className="">
-            <h2 className="text-2xl font-bold mb-1">{dialogContent.title}</h2>
-            <p>{dialogContent.description}</p>
-          </div>
-          <button
-            className="bg-black text-white w-10 h-10 rounded-full mr-2 font-bold flex items-center justify-center"
-            onClick={closeDialog}
-          >
-            X
-          </button>
-        </div>
+        <DialogHeader
+          title={dialogContent.title}
+          description={dialogContent.description}
+          onClose={closeDialog}
+        />
 
-        {dialogContent.title.split(' ')[0] !== 'View' && (
-          <form
-            className="mt-5 flex flex-col"
-            onSubmit={(e) => handleSubmit(dialogContent.title, e)}
-          >
-            {dialogContent.title === "Create Cohort" && (
-              <>
-                <label className="block mb-2" htmlFor="cohortName">
-                  Cohort Name
-                </label>
-                <input
-                  type="text"
-                  id="cohortName"
-                  className="w-full p-2 border border-gray-300 rounded-lg"
-                />
-              </>
-            )}
-            
-            {dialogContent.title === "Create Course" && (
-              <>
-                <label className="block mb-2" htmlFor="courseName">
-                  Course Name
-                </label>
-                <input
-                  type="text"
-                  id="courseName"
-                  className="w-full p-2 border border-gray-300 rounded-lg"
-                />
-                <label className="block mb-2 mt-5" htmlFor="cohortId">
-                  Cohort
-                </label>
-                <select
-                  id="cohortId"
-                  className="w-full p-2 border border-gray-300 rounded-lg"
-                >
-                  <option value="" disabled selected>
-                    {cohorts.length === 0
-                      ? "No cohorts available"
-                      : "Select a cohort"}
-                  </option>
-                  {cohorts.map((cohort) => (
-                    <option key={cohort.id} value={cohort.id}>
-                      {cohort.name}
-                    </option>
-                  ))}
-                </select>
-              </>
-            )}
-            <p className="mt-5 text-green-500">{response}</p>
-            <button
-              className="bg-black text-white px-4 py-2 rounded-lg mt-5 justify-self-end"
-              type="submit"
-            >
-              Done
-            </button>
-          </form>
-        )}
-
-        <div className="mt-5">
-        {dialogContent.title === "View Cohorts" && (
-              <ul>
-                {cohorts.map((cohort) => (
-                  <li key={cohort.id}>{cohort.name}</li>
-                ))}
-              </ul>
-          )}
-          
-          {dialogContent.title === "View Courses" && (
-            <>
-              <select
-                id="cohortId"
-                className="w-full p-2 border border-gray-300 rounded-lg"
-                onChange={(e) => handleViewCourses(e)}
-              >
-                <option value="" disabled selected>
-                  {cohorts.length === 0
-                    ? "No cohorts available"
-                    : "Select a cohort"}
-                </option>
-                {cohorts.map((cohort) => (
-                  <option key={cohort.id} value={cohort.id}>
-                    {cohort.name}
-                  </option>
-                ))}
-              </select>
-              <ul className="mt-5">
-                {courses.map((course) => (
-                  <li key={course.id}>{course.name}</li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
+        {formComponents[dialogContent.title] || viewComponents[dialogContent.title]}
       </dialog>
     </div>
   );

@@ -51,16 +51,50 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/:cohortId", async (req, res) => {
   try {
-    const { cohortId } = req.body;
+    const { cohortId } = req.params;
     const students = await prisma.student.findMany({
-      where: { cohortId: Number(cohortId) },
-      include: { courses: true },
+      where: { 
+        cohortId: Number(cohortId) 
+      },
+      include: {
+        courses: {
+          include: {
+            course: {
+              select: {
+                id: true,
+                name: true,
+                createdAt: true,
+                updatedAt: true
+              }
+            }
+          }
+        }
+      }
     });
-    res.json(students);
+
+    const transformedStudents = students.map(student => ({
+      id: student.id,
+      name: student.name,
+      status: student.status,
+      createdAt: student.createdAt,
+      updatedAt: student.updatedAt,
+      courses: student.courses.map(sc => ({
+        id: sc.course.id,
+        name: sc.course.name,
+        enrolledAt: sc.createdAt,
+        lastUpdated: sc.updatedAt
+      }))
+    }));
+
+    res.json(transformedStudents);
   } catch (error) {
-    res.status(500).json({ error: error });
+    console.error("Error fetching cohort students:", error);
+    res.status(500).json({ 
+      error: "Failed to fetch cohort students",
+      details: error
+    });
   }
 });
 
@@ -71,6 +105,7 @@ router.get("/:id", async (req, res) => {
       where: { studentId: Number(id) },
       include: { course: true },
     });
+    
     res.json(courses);
   } catch (error) {
     res.status(500).json({ error: error });
