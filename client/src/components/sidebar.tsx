@@ -11,7 +11,10 @@ const SideBar = () => {
     { img: "/settings.svg", label: "Settings" },
   ];
 
-  const [active, setActive] = useState("Dashboard");
+  const path = window.location.pathname.split("/")[1];
+  const [active, setActive] = useState(
+    path === "" ? "Dashboard" : path.charAt(0).toUpperCase() + path.slice(1)
+  );
 
   return (
     <div className="h-screen w-[280px] bg-white px-[12px] py-[30px] flex flex-col gap-[30px]">
