@@ -1,6 +1,23 @@
+import apiRequest from "../lib/apiRequest";
 import { Student } from "../lib/types";
 
-const Table = ({ data }: { data: Student[] }) => {
+const Table = ({ data, fetchStudents }: { data: Student[] ; fetchStudents: (search: string) => void }) => {
+
+    const handleStatusChange = async (student: Student) => {
+        try {
+          const updatedStatus = student.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+      
+          await apiRequest.put(`/student/${student.id}`, {
+            name: student.name,
+            status: updatedStatus,
+            courses: student.courses.map((course) => course.id),
+          });
+          fetchStudents('');
+        } catch (error) {
+          console.error("Error updating student status:", error);
+        }
+      };
+      
 
     return (
             <table className="w-full table-fixed border-collapse mt-[40px] text-[12px] font-medium">
@@ -39,12 +56,13 @@ const Table = ({ data }: { data: Student[] }) => {
                             <td className="text-center px-4 py-2">
                             <div className="flex justify-center items-center">
                                     <div
-                                        className={`w-4 h-4 rounded-full border-2 ${
+                                        className={`w-[14.4px] h-[14px] cursor-pointer rounded-full border-2 ${
                                             student.status === "ACTIVE"
-                                                ? "border-green-500 bg-green-500"
-                                                : "border-gray-400 bg-gray-400"
-                                        }`}
-                                    ></div>
+                                                ? "bg-[#4AEA40] border-[#4AEA40]"
+                                                : "bg-[#EA4E40] border-[#EA4E40]"
+                                        }`} onClick={() => handleStatusChange(student)}
+                                        >
+                                        </div>
                                 </div>
                             </td>
                         </tr>

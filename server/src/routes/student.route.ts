@@ -30,24 +30,35 @@ router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { name, status, courses } = req.body;
-
+    
     const updatedStudent = await prisma.student.update({
-      where: { id: Number(id) },
-      data: {
-        name: name,
-        status: status,
-        courses: {
-          set: courses.map((courseId: Number) => ({
-            courseId: Number(courseId),
-          })),
-        },
+      where: { 
+        id: Number(id) 
       },
-      include: { courses: true },
+      data: {
+        name,
+        status,
+        courses: {
+          deleteMany: {}, 
+          create: courses.map((courseId: number) => ({
+            course: {
+              connect: { id: Number(courseId) }
+            }
+          }))
+        }
+      },
+      include: {
+        courses: {
+          include: {
+            course: true
+          }
+        }
+      }
     });
-
+    
     res.json(updatedStudent);
   } catch (error) {
-    res.status(500).json({ error: error });
+    console.error("Prisma error:", error);
   }
 });
 

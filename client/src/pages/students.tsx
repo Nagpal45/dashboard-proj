@@ -153,7 +153,7 @@ const Students = () => {
           />
         </dialog>
       </div>
-      <Table data={students} />
+      <Table data={students} fetchStudents={fetchStudents} />
     </div>
   );
 };
