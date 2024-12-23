@@ -109,7 +109,7 @@ const Students = () => {
   }, []);
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full pb-10">
       <div className="flex flex-row justify-between">
         <div className="flex flex-row gap-5">
           <div className="w-[200px]">

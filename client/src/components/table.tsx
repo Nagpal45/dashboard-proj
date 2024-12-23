@@ -36,7 +36,7 @@ const Table = ({ data, fetchStudents }: { data: Student[] ; fetchStudents: (sear
                         <tr
                             key={student.id}
                             className="border-b border-t hover:bg-gray-100"
-                            style={{ height: "50px" }} // Adjusts the row height
+                            style={{ height: "50px" }}
                         >
                             <td className="px-4 py-2">{student.name}</td>
                             <td className="px-4 py-2">{student.cohort.name}</td>
