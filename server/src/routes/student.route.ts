@@ -1,6 +1,30 @@
 import { Router } from "express";
 import { prisma } from "../index";
 
+interface Student {
+  id: number;
+  name: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  cohort: {
+    id: number;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+  } | null;
+  courses: {
+    course: {
+      id: number;
+      name: string;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
+}
+
 const router = Router();
 
 router.post("/", async (req, res) => {
@@ -110,7 +134,7 @@ router.get("/:cohortId?", async (req, res) => {
       }
     });
 
-    const transformedStudents = students.map(student => ({
+    const transformedStudents = students.map((student: Student) => ({
       id: student.id,
       name: student.name,
       status: student.status,
@@ -122,7 +146,7 @@ router.get("/:cohortId?", async (req, res) => {
         createdAt: student.cohort.createdAt,
         updatedAt: student.cohort.updatedAt
       } : null,
-      courses: student.courses.map(sc => ({
+      courses: student.courses.map((sc: Student["courses"][0]) => ({
         id: sc.course.id,
         name: sc.course.name,
         enrolledAt: sc.createdAt,
