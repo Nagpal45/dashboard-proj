@@ -1,31 +1,66 @@
 import { useEffect, useRef, useState } from "react";
 import { CohortSelect } from "../components/cohortSelect";
 import { AddStudentForm } from "../components/forms/addStudent";
-import apiRequest from "../lib/apiRequest";
-import { Cohort, Course, Student } from "../lib/types";
 import { DialogHeader } from "../components/dialogHeader";
 import Table from "../components/table";
+import { createStudent, fetchStudents } from "../store/slices/studentSlice";
+import { fetchCourses } from "../store/slices/courseSlice";
+import { fetchCohorts } from "../store/slices/cohortSlice";
+import { AppDispatch, RootState } from "../store";
+import { useDispatch, useSelector } from "react-redux";
 
 const Students = () => {
-  const [cohorts, setCohorts] = useState<Cohort[]>([]);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [response, setResponse] = useState<string>("");
+  const dispatch = useDispatch<AppDispatch>();
+  const cohorts = useSelector((state: RootState) => state.cohorts.items);
+  const courses = useSelector((state: RootState) => state.courses.items);
+  const students = useSelector((state: RootState) => state.students.items);
+  
+  const [selectedCohort, setSelectedCohort] = useState<string>('');
+  const [response, setResponse] = useState<string>('');
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [selectedCohort, setSelectedCohort] = useState<string>("");
 
   useEffect(() => {
-    const fetchCohorts = async () => {
+    dispatch(fetchCohorts());
+    dispatch(fetchStudents({ cohortId: '' }));
+  }, [dispatch]);
+
+  const handleSubmit = async (title: string, e: React.FormEvent) => {
+    e.preventDefault();
+    if (title === 'Add Student') {
+      const studentName = (e.target as HTMLFormElement).studentName.value;
+      const cohortId = (e.target as HTMLFormElement).cohortId.value;
+      const courses = Array.from(
+        (e.target as HTMLFormElement).courseId as unknown as HTMLInputElement[]
+      )
+        .filter((input: HTMLInputElement) => input.checked)
+        .map((input: HTMLInputElement) => input.value);
+
       try {
-        const response = await apiRequest.get("/cohort");
-        setCohorts(response.data);
+        await dispatch(createStudent({ name: studentName, cohortId, courses })).unwrap();
+        (e.target as HTMLFormElement).reset();
+        setResponse('Success!');
+        setTimeout(() => setResponse(''), 2000);
+        dispatch(fetchStudents({ cohortId: '' }));
       } catch (error) {
         console.error(error);
+        setResponse('Error occurred');
       }
-    };
+    }
+  };
 
-    fetchCohorts();
-  }, [response]);
+  const handleCohortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const cohortId = e.target.value;
+    setSelectedCohort(cohortId);
+    dispatch(fetchStudents({ cohortId }));
+    dispatch(fetchCourses(cohortId));
+  };
+
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const courseId = e.target.value;
+    if (selectedCohort) {
+      dispatch(fetchStudents({ cohortId: selectedCohort, courseId }));
+    }
+  };
 
   const openDialog = () => {
     if (dialogRef.current) {
@@ -38,75 +73,7 @@ const Students = () => {
       dialogRef.current.close();
     }
     setResponse("");
-    setCourses([]);
   };
-
-  const handleSubmit = async (title: string, e: React.FormEvent) => {
-    e.preventDefault();
-    if (title === "Add Student") {
-      const studentName = (e.target as HTMLFormElement).studentName.value;
-      const cohortId = (e.target as HTMLFormElement).cohortId.value;
-      const courses = Array.from(
-        (e.target as HTMLFormElement).courseId as unknown as HTMLInputElement[]
-      )
-        .filter((input: HTMLInputElement) => input.checked)
-        .map((input: HTMLInputElement) => input.value);
-
-      try {
-        const response = await apiRequest.post("/student", {
-          name: studentName,
-          cohortId,
-          courses,
-        });
-        (e.target as HTMLFormElement).reset();
-        setResponse(response.statusText + "!");
-        setTimeout(() => {
-          setResponse("");
-        }, 2000);
-        fetchStudents("");
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
-
-  const fetchStudents = async (cohortId: string, courseId?: string) => {
-    try {
-      const response = await apiRequest.get(
-        `/student/${cohortId}${courseId ? `?courseId=${courseId}` : ""}`
-      );
-      setStudents(response.data || []);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchCourses = async (cohortId: string) => {
-    try {
-      const response = await apiRequest.get(`/course/${cohortId}`);
-      setCourses(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleCohortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const cohortId = e.target.value;
-    setSelectedCohort(cohortId);
-    fetchStudents(cohortId);
-    fetchCourses(cohortId);
-  };
-
-  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const courseId = e.target.value;
-    if (selectedCohort) {
-      fetchStudents(selectedCohort, courseId);
-    }
-  };
-
-  useEffect(() => {
-    fetchStudents('');
-  }, []);
 
   return (
     <div className="flex flex-col w-full pb-10">
@@ -153,7 +120,7 @@ const Students = () => {
           />
         </dialog>
       </div>
-      <Table data={students} fetchStudents={fetchStudents} />
+      <Table data={students} />
     </div>
   );
 };

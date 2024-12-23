@@ -1,7 +1,12 @@
+import { useDispatch } from "react-redux";
 import apiRequest from "../lib/apiRequest";
 import { Student } from "../lib/types";
+import { AppDispatch } from "../store";
+import { fetchStudents } from "../store/slices/studentSlice";
 
-const Table = ({ data, fetchStudents }: { data: Student[] ; fetchStudents: (search: string) => void }) => {
+const Table = ({ data}: { data: Student[] }) => {
+    const dispatch = useDispatch<AppDispatch>();
+
 
     const handleStatusChange = async (student: Student) => {
         try {
@@ -12,7 +17,8 @@ const Table = ({ data, fetchStudents }: { data: Student[] ; fetchStudents: (sear
             status: updatedStatus,
             courses: student.courses.map((course) => course.id),
           });
-          fetchStudents('');
+          
+          dispatch(fetchStudents({ cohortId: "" }));
         } catch (error) {
           console.error("Error updating student status:", error);
         }
