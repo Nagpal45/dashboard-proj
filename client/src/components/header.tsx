@@ -7,15 +7,15 @@ const Header = () => {
   ];
 
   return (
-    <header className="h-[48px] flex items-center justify-between">
-      <div className="bg-white w-[614px] rounded-[12px] h-full px-[20px] flex flex-row gap-[10px] items-center">
+    <header className="w-full lg:h-[48px] flex items-center justify-between flex-col lg:flex-row flex-col-reverse">
+      <div className="lg:mt-0 mt-5 bg-white w-full lg:w-[614px] rounded-[12px] h-[50px] lg:h-full px-[20px] flex flex-row gap-[10px] items-center">
         <img src="/search.svg" alt="search" width={18} height={18} />
         <input
           className="text-[16px] font-medium text-[#808281] w-full outline-none"
           placeholder="Search your course"
         />
       </div>
-      <div className="w-[500px] h-full flex flex-row items-center justify-between">
+      <div className="w-5/6 lg:w-[500px] self-end h-full flex flex-row items-center justify-between gap-5">
         {headerOptions.map((option, index) => (
           <div
             className="flex items-center relative p-[2px] cursor-pointer"
@@ -33,7 +33,7 @@ const Header = () => {
             />
           </div>
         ))}
-        <div className="w-[200px] h-full flex flex-row items-center justify-between">
+        <div className="lg:w-[200px] h-full flex flex-row items-center justify-between">
           <img src="/user.svg" alt="user" width={48} height={48} />
           <p className="text-[18px] font-semibold">Adeline H. Dency</p>
         </div>

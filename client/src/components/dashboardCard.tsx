@@ -6,7 +6,7 @@ interface DashboardCardProps {
 }
 
 export const DashboardCard = ({ option, onAction }: DashboardCardProps) => (
-  <div className="border border-2 p-4 rounded-2xl flex flex-row shadow-lg items-center justify-between">
+  <div className="border border-2 p-4 rounded-2xl flex flex-row shadow-lg items-center justify-between mb-4 lg:mb-0">
     <div>
       <h3 className="text-xl font-bold">{option.title}</h3>
       <p>{option.description}</p>

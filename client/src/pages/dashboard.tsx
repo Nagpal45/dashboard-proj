@@ -97,14 +97,14 @@ const Dashboard = () => {
 
 
   return (
-    <div className="p-5 pb-10">
-      <div className="grid grid-cols-2 gap-7 overflow-hidden">
+    <div className="lg:p-5 lg:pb-10">
+      <div className="md:grid grid-cols-2 gap-7 overflow-hidden">
         {dashboardOptions.map((option, index) => (
           <DashboardCard key={index} option={option} onAction={() => openDialog(option)}/>
         ))}
       </div>
 
-      <dialog ref={dialogRef} className="rounded-lg p-5 w-1/3 backdrop:bg-black/70 max-h-[600px]">
+      <dialog ref={dialogRef} className="rounded-lg p-5 w-5/6 md:w-1/2 lg:w-1/3 backdrop:bg-black/70 max-h-[600px]">
         <DialogHeader title={dialogContent.title} description={dialogContent.description} onClose={closeDialog}/>
 
         {dialogContent.title === "Create Cohort" && (

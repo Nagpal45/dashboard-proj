@@ -29,12 +29,12 @@ const Table = ({ data}: { data: Student[] }) => {
             <table className="w-full table-fixed border-collapse mt-[40px] text-[12px] font-medium">
                 <thead>
                     <tr style={{ height: "50px" }}>
-                        <th className="w-1/6 text-left px-4 py-2">Student Name</th>
-                        <th className="w-1/6 text-left px-4 py-2">Cohort</th>
-                        <th className="w-1/4 text-left px-4 py-2">Courses</th>
-                        <th className="w-1/6 text-left px-4 py-2">Date Joined</th>
-                        <th className="w-1/6 text-left px-4 py-2">Last Login</th>
-                        <th className="w-1/12 text-center px-4 py-2">Status</th>
+                        <th className="md:w-1/6 text-left md:px-4 md:py-2">Student Name</th>
+                        <th className="md:w-1/6 text-left md:px-4 md:py-2">Cohort</th>
+                        <th className="md:w-1/4 text-left md:px-4 md:py-2">Courses</th>
+                        <th className="md:w-1/6 text-left px-4 py-2">Date Joined</th>
+                        <th className="hidden md:block md:w-1/6 text-left md:px-4 md:py-2">Last Login</th>
+                        <th className="md:w-1/12 text-center px-4 py-2">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,8 +44,8 @@ const Table = ({ data}: { data: Student[] }) => {
                             className="border-b border-t hover:bg-gray-100"
                             style={{ height: "50px" }}
                         >
-                            <td className="px-4 py-2">{student.name}</td>
-                            <td className="px-4 py-2">{student.cohort.name}</td>
+                            <td className="md:px-4 md:py-2">{student.name}</td>
+                            <td className="md:px-4 md:py-2">{student.cohort.name}</td>
                             <td className="px-4 py-2">
                                 {student.courses.map((course) => (
                                     <div
@@ -58,7 +58,7 @@ const Table = ({ data}: { data: Student[] }) => {
                                 ))}
                             </td>
                             <td className="px-4 py-2">{student.createdAt.split("T")[0].split("-").reverse().join(".")}</td>
-                            <td className="px-4 py-2">{student.updatedAt.split("T")[0].split("-").reverse().join(".") + " " + student.updatedAt.split("T")[1].split(".")[0].split(":").slice(0, 2).join(":")}</td>
+                            <td className="hidden md:block px-4 py-2">{student.updatedAt.split("T")[0].split("-").reverse().join(".") + " " + student.updatedAt.split("T")[1].split(".")[0].split(":").slice(0, 2).join(":")}</td>
                             <td className="text-center px-4 py-2">
                             <div className="flex justify-center items-center">
                                     <div

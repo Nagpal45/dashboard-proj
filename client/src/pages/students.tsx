@@ -77,15 +77,15 @@ const Students = () => {
 
   return (
     <div className="flex flex-col w-full pb-10">
-      <div className="flex flex-row justify-between">
-        <div className="flex flex-row gap-5">
-          <div className="w-[200px]">
+      <div className="flex flex-col md:flex-row justify-between md:gap-0 gap-3">
+        <div className="flex flex-col md:flex-row md:gap-0 gap-3">
+          <div className="w-full md:w-[200px]">
             <CohortSelect
               cohorts={cohorts}
               onChange={handleCohortChange}
             />
           </div>
-          <div className="w-[200px]">
+          <div className="w-full md:w-[200px]">
             <CohortSelect
               cohorts={courses}
               onChange={handleCourseChange}
@@ -94,7 +94,7 @@ const Students = () => {
           </div>
         </div>
         <button
-          className="bg-[#E9EDF1] w-[200px] rounded-[6px] flex flex-row items-center justify-center gap-[10px] text-[16px] font-bold text-[#3F526E]"
+          className="bg-[#E9EDF1] h-[40px] md:w-[200px] rounded-[6px] flex flex-row items-center justify-center gap-[10px] text-[16px] font-bold text-[#3F526E]"
           onClick={openDialog}
         >
           <img src="/add.svg" alt="add" width="20" height="20" />
@@ -102,7 +102,7 @@ const Students = () => {
         </button>
         <dialog
           ref={dialogRef}
-          className="rounded-lg p-5 w-1/3 backdrop:bg-black/70 max-h-[600px]"
+          className="rounded-lg p-5 w-5/6 md:w-1/2 lg:w-1/3 backdrop:bg-black/70 max-h-[600px]"
         >
           <DialogHeader
             title={"Add Student"}
@@ -114,8 +114,8 @@ const Students = () => {
             response={response}
             cohorts={cohorts}
             courses={courses}
-            onCohortSelect={(e) =>
-              fetchCourses((e.target as HTMLSelectElement).value)
+            onCohortSelect={(e) =>              
+              dispatch(fetchCourses(e.target.value))
             }
           />
         </dialog>
