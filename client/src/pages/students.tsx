@@ -78,7 +78,7 @@ const Students = () => {
   return (
     <div className="flex flex-col w-full pb-10">
       <div className="flex flex-col md:flex-row justify-between md:gap-0 gap-3">
-        <div className="flex flex-col md:flex-row md:gap-0 gap-3">
+        <div className="flex flex-col md:flex-row gap-3">
           <div className="w-full md:w-[200px]">
             <CohortSelect
               cohorts={cohorts}

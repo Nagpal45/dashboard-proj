@@ -33,7 +33,7 @@ const Table = ({ data}: { data: Student[] }) => {
                         <th className="md:w-1/6 text-left md:px-4 md:py-2">Cohort</th>
                         <th className="md:w-1/4 text-left md:px-4 md:py-2">Courses</th>
                         <th className="md:w-1/6 text-left px-4 py-2">Date Joined</th>
-                        <th className="hidden md:block md:w-1/6 text-left md:px-4 md:py-2">Last Login</th>
+                        <th className="hidden md:block text-left md:px-4 md:py-2">Last Login</th>
                         <th className="md:w-1/12 text-center px-4 py-2">Status</th>
                     </tr>
                 </thead>
