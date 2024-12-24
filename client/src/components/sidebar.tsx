@@ -17,7 +17,7 @@ const SideBar = () => {
   );
 
   return (
-    <div className="h-screen w-[280px] bg-white px-[12px] py-[30px] flex flex-col gap-[30px]">
+    <div className="min-h-screen w-[280px] bg-white px-[12px] py-[30px] flex flex-col gap-[30px]">
       <img src="/logo.svg" alt="logo" width={98} height={42} />
       <ul className="flex flex-col gap-[8px]">
         {navOptions.map((option, index) => (
