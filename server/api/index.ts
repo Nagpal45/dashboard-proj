@@ -1,5 +1,4 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import cohortRoutes from './routes/cohort.route';
@@ -15,7 +14,6 @@ app.use(cors({
     credentials: true
 }))
 
-export const prisma = new PrismaClient();
 
 app.use('/api/cohort', cohortRoutes);
 app.use('/api/student', studentRoutes);
