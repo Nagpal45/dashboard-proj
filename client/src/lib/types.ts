@@ -10,10 +10,10 @@ export interface Cohort {
   }
   
   export interface Student {
-    status: ReactNode;
-    updatedAt: ReactNode;
-    createdAt: ReactNode;
-    cohort: any;
+    status: string;
+    updatedAt: string;
+    createdAt: string;
+    cohort: Cohort;
     id: string;
     name: string;
     cohortId: string;
