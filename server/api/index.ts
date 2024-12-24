@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: ['https://dashboard-proj-1b9c.vercel.app', 'http://localhost:5173'],
+    origin: ['https://dashboard-proj-3wd7.vercel.app', 'http://localhost:5173'],
     credentials: true
 }))
 
